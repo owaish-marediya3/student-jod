@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Jod Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>    
+    <style>
+        :root {
+            --islamic-green: #004d2c;
+            --gold: #d4af37;
+            --light-cream: #f9fbf9;
+            --white: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-cream);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* UPDATED HEADER BOX: Space between Title and Button Group */
+        .header-box {
+            display: flex;
+            flex-direction: row; 
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Allows wrapping on small mobile screens */
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        /* NEW BUTTON GROUP: Keeps buttons side-by-side */
+        .button-group {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h1 {
+            font-family: 'Amiri', serif;
+            color: var(--islamic-green);
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            margin: 0;
+        }
+
+        /* STANDARDIZED BUTTONS: Ensures both are same height and alignment */
+        .btn-add, .download button {
+            height: 45px; /* Uniform Height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px; /* Uniform Padding */
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            text-decoration: none;
+            margin: 0; /* Removes extra margins */
+        }
+
+        .btn-add {
+            background: var(--gold);
+            color: var(--islamic-green);
+        }
+
+        .btn-add:hover {
+            background: #c29d2f;
+            transform: translateY(-2px);
+        }
+
+        .download button {
+            background-color: #0186a6;
+            color: white;
+            gap: 8px;
+        }
+
+        .download button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .download button svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Data Card & Table (UNTOUCHED) */
+        .data-card {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--islamic-green);
+            overflow: hidden; 
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #f8f9fa;
+        }
+
+        th {
+            color: var(--islamic-green);
+            text-align: left;
+            padding: 15px;
+            border-bottom: 2px solid var(--gold);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95rem;
+        }
+
+        tr:hover {
+            background-color: rgba(212, 175, 55, 0.05);
+        }
+
+        /* Action button */
+        .btn-edit {
+            background-color: #c29d2f;
+            padding: 6px 12px;
+            width: 80px;
+            color: white;
+            border: 1px solid transparent;
+            border-radius: 9999px;
+            cursor: pointer;
+        }
+
+        .btn-delete {
+            background-color: red;
+            color: white;
+            width: 80px;
+            padding: 6px 12px;
+            border: 1px solid transparent;
+            border-radius: 9999px;
+            cursor: pointer;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+        } 
+
+        @media (max-width: 768px) {
+            .header-box {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            thead {
+                display: none; 
+            }
+
+            tr {
+                display: block;
+                border-bottom: 2px solid #bbb !important;
+                padding: 10px 0;
+            }
+
+            tbody tr:nth-child(even) {
+                background-color: rgba(0, 0, 0, 0.03);
+            }
+
+            td {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 15px;
+                border: none;
+                text-align: right;
+            }
+
+            td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: var(--islamic-green);
+                text-transform: uppercase;
+                font-size: 0.75rem;
+                flex: 1;
+                text-align: left;
+            }
+
+            .total-div {
+                text-align: center;
+            }
+
+            /* Action button */
+        .btn-edit {
+            background-color: #c29d2f       ;
+            padding: 6px 12px;
+            width: 80px;
+            color: white;
+            border: 1px solid transparent;
+            border-radius: 999px;
+            cursor: pointer;
+        }
+
+        .btn-delete {
+            background-color: red;
+            color: white;
+            width: 80px;
+            padding: 6px 12px;
+            border: 1px solid transparent;
+            border-radius: 999px;
+            cursor: pointer;
+        }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <div class="header-box">
+                <h1>Talib-e-Ilm Ki List</h1>
+                <div class="button-group">
+                    <a href="/" class="btn-add">+ Naya Talib-e-Ilm</a>
+                    <div class="download">
+                        <button id="download-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="total-div">
+                <h4 id="total-div">Total Student</h4>
+            </div>
+            <div class="data-card">
+                <table id="studentTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Student Name</th>
+                            <th>Contact</th>
+                            <th>Qualification</th>
+                            <!-- <th>Actions</th> -->
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+<script>
+
+    window.onload = function() {
+        const labels = ["Sr No", "Student Name", "Contact", "Qualification"];
+        
+        fetch('/fetch-data')
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById('tableBody'); 
+            let count = 0
+            data.forEach((row) => {
+                const tableRow = document.createElement('tr');
+                row.forEach((cell, index) => {
+                    const tableData = document.createElement('td');
+                    tableData.setAttribute('data-label', labels[index]);
+                    tableData.textContent = cell;
+                    tableRow.appendChild(tableData);
+                });
+
+            // const actionData = document.createElement('td');
+            // actionData.setAttribute('data-label', 'Actions');
+            // actionData.className = 'action-buttons';
+
+            // const editBtn = document.createElement('button');
+            // editBtn.textContent = 'Edit';
+            // editBtn.className = 'btn-edit';
+            // editBtn.onclick = () => console.log('Edit student:', row[0]);
+
+            // const delebtn = document.createElement('button')
+            // delebtn.textContent = 'Delete'
+            // delebtn.className = 'btn-delete';
+            // delebtn.onclick = () => console.log('Delete button', row[0]);
+
+            // actionData.appendChild(editBtn);
+            // actionData.appendChild(delebtn);
+            // tableRow.appendChild(actionData);
+
+            // // Edit Button Function
+            // editBtn.onclick = () => {
+
+            // }
+            // // Delete button Functio
+            // delebtn.onclick = () => {
+
+            // }
+
+                
+                count ++
+                tableBody.appendChild(tableRow);
+                
+                // total student counter
+                document.getElementById('total-div').textContent = `Total Students : ${count}`
+            });
+        })
+    }
+
+
+    // download button functionality
+    document.getElementById('download-btn').addEventListener('click', function(){
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const table = document.getElementById("studentTable");
+        const year = new Date().getFullYear();
+        doc.setFontSize(18);
+        doc.setTextColor(1, 134, 166);
+        doc.text(`Student Records ${year}`, 104, 20, {align:'center'});
+        doc.autoTable({ html: table, startY: 30});
+        doc.save('Student Record.pdf');
+    });
+</script>
+</body>
+</html>

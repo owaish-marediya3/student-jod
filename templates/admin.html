@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --islamic-green: #004d2c;
+            --dark-green: #002b18;
+            --gold: #d4af37;
+            --soft-gold: #f9e29c;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Deep Islamic Green Gradient */
+            background: radial-gradient(circle at center, var(--islamic-green) 0%, var(--dark-green) 100%);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Pattern Overlay (Islamic Geometry) */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/islamic-art.png');
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        /* Responsive Glassmorphism Card */
+        .login-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); /* Safari support */
+            padding: 40px 30px;
+            width: 90%; /* Default for mobile */
+            max-width: 380px; /* Max width for desktop */
+            border-radius: 40px 0px 40px 0px; 
+            border: 2px solid var(--gold);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(212, 175, 55, 0.1);
+            text-align: center;
+            z-index: 1;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        h2 {
+            color: var(--gold);
+            font-family: 'Amiri', serif;
+            font-size: clamp(1.8rem, 8vw, 2.5rem); /* Fluid size */
+            margin: 0 0 20px 0;
+            letter-spacing: 1px;
+        }
+
+        .input-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 15px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            outline: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border: 1px solid var(--gold);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Placeholder color for better visibility */
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 300;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(45deg, var(--gold), var(--soft-gold));
+            color: var(--dark-green);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.4s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.5);
+            letter-spacing: 2px;
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Tablet and Desktop adjustments */
+        @media (min-width: 768px) {
+            .login-card {
+                padding: 50px 40px;
+            }
+        }
+
+        /* Height fix for very small phones or landscape mode */
+        @media (max-height: 500px) {
+            body {
+                align-items: flex-start;
+                padding-top: 20px;
+                padding-bottom: 20px;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h2>Admin</h2>
+        
+        <form action="/authAdmin" method="POST">
+            <div class="input-box">
+                <input type="text" placeholder="Username" required name="username">
+            </div>
+            <div class="input-box">
+                <input type="password" placeholder="Password" required name="password">
+            </div>
+            <button type="submit">LOGIN</button>
+        </form>
+    </div>
+
+</body>
+</html>

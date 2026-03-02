@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jod Form Submitted</title>
+    <style>
+        /* Modern Reset */
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: url('https://imgs.search.brave.com/mcQ2mMEKIXbW0lNOSWGGrPztGnjf2WBKbNtGThxpWwY/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jb250/ZW50LmpkbWFnaWNi/b3guY29tL2NvbXAv/ZGVmX2NvbnRlbnQv/bW9zcXVlcy9zY3Jl/ZW5zaG90LTItbW9z/cXVlcy04LXMzY292/LmpwZz93PTM4NDAm/cT03NQ');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.1); /* Subtle white tint */
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px); /* Safari support */
+            
+            /* Responsive Width */
+            width: 100%;
+            max-width: 450px; 
+            
+            /* Responsive Height - Auto adjusts to content */
+            padding: 40px 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            /* Smooth scaling font */
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 700;
+            color: #ffffff; /* Changed to white for better contrast on dark blur */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            direction: rtl; /* Proper alignment for Arabic text */
+        }
+
+        button {
+            background-color: #ffffff;
+            color: #305932;
+            border: none;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%; /* Full width on mobile */
+            max-width: 250px;
+        }
+
+        button:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Desktop Specific Tweaks */
+        @media (min-width: 768px) {
+            .container {
+                padding: 60px 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>جزاك الله خيرا</h1>
+        <form action="/" style="width: 100%;">
+            <button type="submit">Add Another Student</button>
+        </form>
+    </div>
+
+</body>
+</html>

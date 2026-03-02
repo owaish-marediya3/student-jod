@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Jod Form</title>
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f9;
+            font-family: 'Poppins', sans-serif, system-ui;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90%; 
+            max-width: 400px; 
+            box-sizing: border-box;
+            margin: 20px auto;
+        }
+        .logo img {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+            margin-bottom: 10px;
+            border-radius: 10px;
+        }
+        .heading h3 {
+            margin: 0 0 20px 0;
+            color: #333;
+            font-size: 1.5rem;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+        label {
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #555;
+        }
+        input {
+            margin-bottom: 15px;
+            padding: 12px; 
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 13px; 
+            width: 100%;
+            box-sizing: border-box;
+            transition: border 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border: 2px solid #305932;
+        }
+        button {
+            padding: 14px;
+            background-color: #305932;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        button:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #complete-number, #useralready {
+            display: none;
+            color: #d93025;
+            font-size: 12px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="logo">
+            <img src="https://res.cloudinary.com/dsnlm6bod/image/upload/v1772262561/logo_mjnc2t.png" alt="Logo">
+        </div>
+        <div class="heading">
+            <h3>Student Form</h3>
+            <p id="useralready">User Already Exists</p>
+        </div>
+        <form id="studentForm">
+            <label for="name">Name</label>
+            <input name="name" type="text" id="name" placeholder="ENTER NAME" required 
+                   onkeydown="if(/[0-9]/.test(event.key))event.preventDefault();" 
+                   oninput="this.value = this.value.toUpperCase()">
+            
+            <label for="phonenumber">Phone Number</label>
+            <input name="phonenumber" type="tel" id="phonenumber" placeholder="ENTER PHONE NUMBER" maxlength="10" 
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+            <p id="complete-number">Please Enter 10 Digits Only</p>
+
+            <label for="qualification">Qualification</label>
+            <input name="qualification" type="text" id="qualification" placeholder="ENTER QUALIFICATION" required 
+                   oninput="this.value = this.value.toUpperCase()">
+            
+            <button type="submit" id="submit-btn" disabled>Submit</button>
+        </form>
+    </div>
+
+    <script>
+        const phoneInput = document.getElementById('phonenumber');
+        const submitBtn = document.getElementById('submit-btn');
+        const errorMsg = document.getElementById('complete-number');
+        const form = document.getElementById('studentForm');
+        const alreadyExistMsg = document.getElementById('useralready');
+
+        phoneInput.addEventListener('input', () => {
+            if (phoneInput.value.length === 10) {
+                errorMsg.style.display = 'none';
+                submitBtn.disabled = false;
+            } else {
+                errorMsg.style.display = 'block';
+                submitBtn.disabled = true;
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const jsonData = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(jsonData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    window.location.href = result.redirect;
+                } else {
+                    alreadyExistMsg.style.display = 'block';
+                    setTimeout(() => {
+                        alreadyExistMsg.style.display = 'none';
+                        form.reset();
+                        submitBtn.disabled = true;
+                    }, 2000);
+                }
+            } catch (err) {
+                console.error("Error:", err);
+            }
+        });
+    </script>
+</body>
+</html>
