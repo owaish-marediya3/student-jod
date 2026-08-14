@@ -256,11 +256,11 @@
                 <table id="studentTable">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>Sr No</th>
                             <th>Student Name</th>
                             <th>Contact</th>
                             <th>Qualification</th>
-                            <!-- <th>Actions</th> -->
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -271,72 +271,143 @@
     </div>
 
 <script>
+    const updateRowNumbers = () => {
+        const rows = document.querySelectorAll("#studentTable tbody tr");
+        rows.forEach((tr, index) => {
+            const srNoCell = tr.querySelector("td"); // The first cell is Sr No
+            if (srNoCell) {
+                srNoCell.textContent = index + 1;
+            }
+        });
+        document.getElementById('total-div').textContent = `Total Students : ${rows.length}`;
+    };
 
-    window.onload = function() {
+    function loadStudents() {
         const labels = ["Sr No", "Student Name", "Contact", "Qualification"];
         
         fetch('/fetch-data')
         .then(response => response.json())
         .then(data => {
             const tableBody = document.getElementById('tableBody'); 
-            let count = 0
+            tableBody.innerHTML = '';
+            let count = 0;
             data.forEach((row) => {
+                count++;
                 const tableRow = document.createElement('tr');
-                row.forEach((cell, index) => {
-                    const tableData = document.createElement('td');
-                    tableData.setAttribute('data-label', labels[index]);
-                    tableData.textContent = cell;
-                    tableRow.appendChild(tableData);
-                });
-
-            // const actionData = document.createElement('td');
-            // actionData.setAttribute('data-label', 'Actions');
-            // actionData.className = 'action-buttons';
-
-            // const editBtn = document.createElement('button');
-            // editBtn.textContent = 'Edit';
-            // editBtn.className = 'btn-edit';
-            // editBtn.onclick = () => console.log('Edit student:', row[0]);
-
-            // const delebtn = document.createElement('button')
-            // delebtn.textContent = 'Delete'
-            // delebtn.className = 'btn-delete';
-            // delebtn.onclick = () => console.log('Delete button', row[0]);
-
-            // actionData.appendChild(editBtn);
-            // actionData.appendChild(delebtn);
-            // tableRow.appendChild(actionData);
-
-            // // Edit Button Function
-            // editBtn.onclick = () => {
-
-            // }
-            // // Delete button Functio
-            // delebtn.onclick = () => {
-
-            // }
-
                 
-                count ++
+                // Sr No (Sequential ID)
+                const idCell = document.createElement('td');
+                idCell.setAttribute('data-label', 'Sr No');
+                idCell.textContent = count;
+                tableRow.appendChild(idCell);
+                
+                // Student Name
+                const nameCell = document.createElement('td');
+                nameCell.setAttribute('data-label', 'Student Name');
+                nameCell.textContent = row[1];
+                tableRow.appendChild(nameCell);
+                
+                // Contact
+                const contactCell = document.createElement('td');
+                contactCell.setAttribute('data-label', 'Contact');
+                contactCell.textContent = row[2];
+                tableRow.appendChild(contactCell);
+                
+                // Qualification
+                const qualCell = document.createElement('td');
+                qualCell.setAttribute('data-label', 'Qualification');
+                qualCell.textContent = row[3];
+                tableRow.appendChild(qualCell);
+
+                // Actions (Delete Button)
+                const actionCell = document.createElement('td');
+                actionCell.setAttribute('data-label', 'Actions');
+                actionCell.className = 'action-buttons';
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.className = 'btn-delete';
+                deleteBtn.onclick = () => {
+                    const confirmDelete = confirm(`Are you sure you want to delete student "${row[1]}"?`);
+                    if (confirmDelete) {
+                        fetch(`/delete-student/${row[0]}`, {
+                            method: 'POST'
+                        })
+                        .then(res => res.json())
+                        .then(result => {
+                            if (result.status === 'success') {
+                                // Instantly delete row and update counters dynamically without reloading over network
+                                tableRow.remove();
+                                updateRowNumbers();
+                            } else {
+                                alert("Failed to delete: " + result.error);
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Delete error:", err);
+                            alert("Server error. Please try again.");
+                        });
+                    }
+                };
+                actionCell.appendChild(deleteBtn);
+                tableRow.appendChild(actionCell);
+                
                 tableBody.appendChild(tableRow);
-                
-                // total student counter
-                document.getElementById('total-div').textContent = `Total Students : ${count}`
             });
-        })
+            
+            // Total student counter
+            document.getElementById('total-div').textContent = `Total Students : ${count}`;
+        });
     }
 
+    window.onload = loadStudents;
 
-    // download button functionality
+    // download button functionality (styled with Admin theme colors and excludes actions)
     document.getElementById('download-btn').addEventListener('click', function(){
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        const table = document.getElementById("studentTable");
         const year = new Date().getFullYear();
+        
+        // Title Styling: Islamic Green (#004d2c)
         doc.setFontSize(18);
-        doc.setTextColor(1, 134, 166);
+        doc.setTextColor(0, 77, 44); 
         doc.text(`Student Records ${year}`, 104, 20, {align:'center'});
-        doc.autoTable({ html: table, startY: 30});
+        
+        // Parse table rows excluding Actions column
+        const head = [["Sr No", "Student Name", "Contact", "Qualification"]];
+        const body = [];
+        const rows = document.querySelectorAll("#studentTable tbody tr");
+        rows.forEach(tr => {
+            const cells = tr.querySelectorAll("td");
+            if (cells.length >= 4) {
+                body.push([
+                    cells[0].textContent,
+                    cells[1].textContent,
+                    cells[2].textContent,
+                    cells[3].textContent
+                ]);
+            }
+        });
+
+        doc.autoTable({
+            head: head,
+            body: body,
+            startY: 30,
+            headStyles: {
+                fillColor: [0, 77, 44], // #004d2c (Islamic Green)
+                textColor: [255, 255, 255],
+                fontStyle: 'bold'
+            },
+            styles: {
+                font: 'helvetica',
+                lineColor: [212, 175, 55], // #d4af37 (Gold)
+                lineWidth: 0.1
+            },
+            alternateRowStyles: {
+                fillColor: [249, 251, 249]
+            }
+        });
+        
         doc.save('Student Record.pdf');
     });
 </script>

@@ -84,16 +84,80 @@
             transform: translateY(-1px);
         }
         button:disabled {
-            background-color: #ccc;
+            background-color: #4e8251;
             cursor: not-allowed;
         }
-        #complete-number, #useralready {
+        #complete-number, #number-exists, #useralready {
             display: none;
             color: #d93025;
             font-size: 12px;
             margin-top: -10px;
             margin-bottom: 10px;
             font-weight: 500;
+        }
+        
+        /* Success Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border: 2px solid #305932;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.show .modal-card {
+            transform: scale(1);
+        }
+        .modal-card h1 {
+            font-size: 2.2rem;
+            color: #305932;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        .modal-card p {
+            color: #555;
+            font-size: 15px;
+            margin-bottom: 25px;
+        }
+        .modal-card button {
+            width: 100%;
+            padding: 14px;
+            background-color: #305932;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: opacity 0.3s;
+        }
+        .modal-card button:hover {
+            opacity: 0.9;
         }
     </style>
 </head>
@@ -114,9 +178,10 @@
                    oninput="this.value = this.value.toUpperCase()">
             
             <label for="phonenumber">Phone Number</label>
-            <input name="phonenumber" type="tel" id="phonenumber" placeholder="ENTER PHONE NUMBER" maxlength="10" 
+            <input name="phonenumber" type="tel" id="phonenumber" placeholder="ENTER PHONE NUMBER" maxlength="10" required 
                    oninput="this.value = this.value.replace(/[^0-9]/g, '');">
             <p id="complete-number">Please Enter 10 Digits Only</p>
+            <p id="number-exists">This Number is Already Registered</p>
 
             <label for="qualification">Qualification</label>
             <input name="qualification" type="text" id="qualification" placeholder="ENTER QUALIFICATION" required 
@@ -126,26 +191,125 @@
         </form>
     </div>
 
+    <!-- Success Modal Popup (No redirection, fast submission!) -->
+    <div id="successModal" class="modal-overlay">
+        <div class="modal-card">
+            <h1>جزاك الله خيرا</h1>
+            <p>Form Submitted Successfully!</p>
+            <button id="closeModalBtn">Add Another Student</button>
+        </div>
+    </div>
+
     <script>
+        const nameInput = document.getElementById('name');
         const phoneInput = document.getElementById('phonenumber');
+        const qualificationInput = document.getElementById('qualification');
         const submitBtn = document.getElementById('submit-btn');
         const errorMsg = document.getElementById('complete-number');
         const form = document.getElementById('studentForm');
         const alreadyExistMsg = document.getElementById('useralready');
+        const numberExistsMsg = document.getElementById('number-exists');
+        const successModal = document.getElementById('successModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        
+        let isDuplicate = false;
+        let lastCheckedPhone = "";
 
-        phoneInput.addEventListener('input', () => {
-            if (phoneInput.value.length === 10) {
+        const checkDuplicatePhone = async () => {
+            const phone = phoneInput.value;
+            if (phone.length === 10) {
+                if (phone === lastCheckedPhone) {
+                    validateForm();
+                    return;
+                }
+                try {
+                    const response = await fetch(`/check-phone?phone=${phone}`);
+                    const result = await response.json();
+                    lastCheckedPhone = phone;
+                    if (result.exists) {
+                        numberExistsMsg.style.display = 'block';
+                        isDuplicate = true;
+                    } else {
+                        numberExistsMsg.style.display = 'none';
+                        isDuplicate = false;
+                    }
+                } catch (err) {
+                    console.error("Error checking duplicate phone:", err);
+                }
+            } else {
+                numberExistsMsg.style.display = 'none';
+                isDuplicate = false;
+                lastCheckedPhone = "";
+            }
+            validateForm();
+        };
+
+        const validateForm = () => {
+            const nameVal = nameInput.value.trim();
+            const phoneVal = phoneInput.value;
+            const qualVal = qualificationInput.value.trim();
+
+            if (!nameVal || !phoneVal || !qualVal) {
+                submitBtn.disabled = true;
+                return;
+            }
+
+            if (phoneVal.length !== 10) {
+                submitBtn.disabled = true;
+                return;
+            }
+
+            if (isDuplicate) {
+                submitBtn.disabled = true;
+                return;
+            }
+
+            submitBtn.disabled = false;
+        };
+
+        nameInput.addEventListener('input', validateForm);
+        qualificationInput.addEventListener('input', validateForm);
+
+        phoneInput.addEventListener('input', async () => {
+            const length = phoneInput.value.length;
+            
+            numberExistsMsg.style.display = 'none';
+            isDuplicate = false;
+            lastCheckedPhone = "";
+
+            if (length === 0) {
                 errorMsg.style.display = 'none';
-                submitBtn.disabled = false;
+            } else if (length === 10) {
+                errorMsg.style.display = 'none';
+                await checkDuplicatePhone();
             } else {
                 errorMsg.style.display = 'block';
-                submitBtn.disabled = true;
             }
+            validateForm();
+        });
+
+        // Trigger immediate check on blur or change
+        phoneInput.addEventListener('blur', checkDuplicatePhone);
+        phoneInput.addEventListener('change', checkDuplicatePhone);
+
+        // Close modal and reset form
+        closeModalBtn.addEventListener('click', () => {
+            successModal.classList.remove('show');
+            form.reset();
+            lastCheckedPhone = "";
+            isDuplicate = false;
+            validateForm();
         });
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            if (isDuplicate) {
+                numberExistsMsg.style.display = 'block';
+                submitBtn.disabled = true;
+                return;
+            }
+
             const formData = new FormData(form);
             const jsonData = Object.fromEntries(formData.entries());
 
@@ -159,13 +323,14 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    window.location.href = result.redirect;
+                    // Show success popup instantly instead of redirecting!
+                    successModal.classList.add('show');
                 } else {
                     alreadyExistMsg.style.display = 'block';
                     setTimeout(() => {
                         alreadyExistMsg.style.display = 'none';
                         form.reset();
-                        submitBtn.disabled = true;
+                        validateForm();
                     }, 2000);
                 }
             } catch (err) {

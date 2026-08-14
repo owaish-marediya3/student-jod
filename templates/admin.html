@@ -118,6 +118,18 @@
             transform: translateY(0);
         }
 
+        #error-msg {
+            display: none;
+            color: #ff4a4a;
+            font-size: 13px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            background: rgba(255, 74, 74, 0.15);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 74, 74, 0.3);
+        }
+
         /* Tablet and Desktop adjustments */
         @media (min-width: 768px) {
             .login-card {
@@ -140,17 +152,53 @@
 
     <div class="login-card">
         <h2>Admin</h2>
+        <div id="error-msg">Wrong username and password</div>
         
-        <form action="/authAdmin" method="POST">
+        <form id="loginForm">
             <div class="input-box">
-                <input type="text" placeholder="Username" required name="username">
+                <input type="text" id="username" placeholder="Username" required name="username">
             </div>
             <div class="input-box">
-                <input type="password" placeholder="Password" required name="password">
+                <input type="password" id="password" placeholder="Password" required name="password">
             </div>
             <button type="submit">LOGIN</button>
         </form>
     </div>
 
+    <script>
+        const form = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const errorMsg = document.getElementById('error-msg');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            try {
+                const response = await fetch('/authAdmin', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (response.ok && result.status === 'success') {
+                    document.open();
+                    document.write(result.html);
+                    document.close();
+                } else {
+                    errorMsg.style.display = 'block';
+                }
+            } catch (err) {
+                console.error("Login error:", err);
+                errorMsg.style.display = 'block';
+            }
+        });
+
+        const clearError = () => {
+            errorMsg.style.display = 'none';
+        };
+
+        usernameInput.addEventListener('input', clearError);
+        passwordInput.addEventListener('input', clearError);
+    </script>
 </body>
 </html>
